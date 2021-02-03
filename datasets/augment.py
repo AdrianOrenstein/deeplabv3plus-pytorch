@@ -21,6 +21,6 @@ class ReSize_Normalise(object):
         self, image: Image, target: Image
     ) -> [torch.Tensor, torch.Tensor]:
         image = self._preprep(image)
-        image = self._normalise(image)
+        #image = self._normalise(image)
         target = self._preprep(target)
         return image, target

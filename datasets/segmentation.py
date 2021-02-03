@@ -428,7 +428,6 @@ class FruitDataset(CustomDataset):
         gt = Image.fromarray(gt)
         if self._transforms[self._stage] is not None:
             image = self._transforms[self._stage](image, gt)
-        
         return image, gt
 
     def close(self):
