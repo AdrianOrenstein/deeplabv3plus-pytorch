@@ -76,7 +76,7 @@ class SegmentationTrainer(pl.LightningModule):
         self._loss = nn.CrossEntropyLoss()
         self._grad_ckpt = hparams.gradient_ckpt
         self._eval_metric = functional.classification.iou
-        self._device = torch.device(self._get_device)
+        self._device = torch.device(self._get_device())
 
     def _get_device(self):
         return "cuda:0" if torch.cuda.is_available() else "cpu"

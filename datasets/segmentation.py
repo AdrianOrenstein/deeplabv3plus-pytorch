@@ -1,5 +1,6 @@
 import argparse
 import os
+import h5py as h5
 
 import numpy as np
 import torch
@@ -75,6 +76,14 @@ def build_dataset(
         return CustomCityscapes(
             args.dataset_dir, split=image_set, transforms=transform
         )
+    if args.dataset_name == "fruit":
+        dataset = FruitDataset(
+            args.dataset_dir,
+            train_transform=transform,
+            val_transform=transform
+        )
+        dataset.setStage(image_set)
+        return dataset
 
 
 # Override of pytorch Cityscapes dataset to ensure appropriate label
@@ -380,3 +389,51 @@ class ADE20K(CustomDataset):
         target = target * 255 - 1
         target[target == -1] = -100
         return target
+
+
+class FruitDataset(CustomDataset):
+    def __init__(
+        self,
+        root: str,
+        train_transform: torchvision.transforms = None,
+        train_transformGT: torchvision.transforms = None,
+        val_transform: torchvision.transforms = None,
+        val_transformGT: torchvision.transforms = None,
+    ):
+        self._root = root
+        self._transforms = {
+            "train": train_transform,
+            "trainGT": train_transformGT,
+            "val": val_transform,
+            "valGT": train_transformGT,
+        }
+        self._stage = "train"
+        self._archives = {
+            "train": h5.File(os.path.join(root, 'train.hdf5'), 'r'),
+            "val": h5.File(os.path.join(root, "eval.hdf5"), 'r'),
+        }
+        self._labels = {
+            "train": self._archives["train"]["labels"],
+            "val": self._archives["val"]["labels"],
+        }
+        self._images = {
+            "train": self._archives["train"]["images"],
+            "val": self._archives["train"]["images"],
+        }
+
+    def __getitem__(self, index):
+        image = self._images[self._stage][index]
+        gt = self._labels[self._stage][index]
+        image = Image.fromarray(image)
+        gt = Image.fromarray(gt)
+        if self._transforms[self._stage] is not None:
+            image = self._transforms[self._stage](image, gt)
+        
+        return image, gt
+
+    def close(self):
+        self._archives["train"].close()
+        self._archives["val"].close()
+
+    def __len__(self):
+        return len(self._images[self._stage])

@@ -2,8 +2,8 @@
 
 # Script for running network training
 python train_segmentation.py \
-	--dataset_name camvid \
-	--dataset_dir ../../datasets/camvid/ \
+	--dataset_name fruit \
+	--dataset_dir ../../Downloads/ \
 	--decoder refinenet \
 	--encoder resnet_18 \
 	--imagenet \
@@ -14,6 +14,6 @@ python train_segmentation.py \
 	--decay 1e-5 \
 	--momentum 0.9 \
 	--num_epochs 300 \
-	--amp_level O2 \
 	--gradient_ckpt \
+	--amp_level "02" \
 	--gpus "0"

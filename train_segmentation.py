@@ -7,8 +7,8 @@ from segmentation_trainer import SegmentationTrainer
 
 def main():
     args = get_training_arguments()
-    format_arguments(args)
     mode = get_training_mode(args)
+    format_arguments(args)
 
     data_module = SegmentationDataModule(args)
 
@@ -32,6 +32,7 @@ def format_arguments(args):
     # Lightning Modules can't store None
     args.val_interval = 1 if args.val_interval is None else args.val_interval
     args.ckpt_path = None if args.ckpt_path == "None" else args.ckpt_path
+    args.gpus = None if args.gpus == "" else args.gpus
 
 
 def get_training_mode(args):
